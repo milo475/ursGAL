@@ -1,3 +1,4 @@
+import { open, unlink } from 'node:fs/promises';
 import {
   BadRequestException,
   ForbiddenException,
@@ -12,9 +13,37 @@ import {
 import { NotificationsService } from '../notifications/notifications.service';
 import { formatFullAddress, formatShortAddress } from '../orders/address.util';
 import { PrismaService } from '../prisma/prisma.service';
+import { detectImageMime } from '../media/image-magic.util';
 import { CompleteDeliveryDto } from './dto/complete-delivery.dto';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Байршуулсан зургийн ЖИНХЭНЭ агуулгыг (magic byte) шалгаж, зарласан MIME
+ * төрөлтэй нь таарч байгаа эсэхийг батална (R-2). Клиент Content-Type-ыг
+ * хуурамчлаж болох тул зөвхөн multer-ийн fileFilter (mimetype/өргөтгөл)
+ * хангалтгүй. Таарахгүй бол дискнээс устгаж алдаа шиднэ — хуурамч агуулгатай
+ * файл (ж: .png нэртэй HTML/скрипт) серверт үлдэхгүй.
+ */
+async function assertRealImage(file: Express.Multer.File): Promise<void> {
+  let detected: string | null = null;
+  const handle = await open(file.path, 'r');
+  try {
+    const buf = Buffer.alloc(12);
+    await handle.read(buf, 0, 12, 0);
+    detected = detectImageMime(buf);
+  } finally {
+    await handle.close();
+  }
+
+  if (!detected || detected !== file.mimetype) {
+    // Хуурамч/танигдахгүй файлыг дискэн дээр үлдээхгүй
+    await unlink(file.path).catch(() => undefined);
+    throw new BadRequestException(
+      'Файлын агуулга зураг биш байна (jpg/png/webp байх ёстой)',
+    );
+  }
+}
 
 const DRIVER_SELECT = {
   select: { id: true, username: true, fullName: true },
@@ -415,6 +444,12 @@ export class DeliveryService {
     }
     if (order.deliveryStatus === DeliveryStatus.DELIVERED) {
       throw new BadRequestException('Энэ захиалга аль хэдийн хүргэгдсэн');
+    }
+
+    // R-2: байршуулсан файлын агуулга ҮНЭХЭЭР зураг мөн эсэхийг magic
+    // byte-аар батална. Хуурамч бол дискнээс устгаад 400 шиднэ.
+    if (file) {
+      await assertRealImage(file);
     }
 
     const proofUrl = file ? `/api/uploads/${file.filename}` : null;

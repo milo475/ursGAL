@@ -10,7 +10,7 @@ import Modal from '../../components/ui/Modal'
 import Spinner from '../../components/ui/Spinner'
 import { useToast } from '../../components/ui/Toast'
 import { useLang } from '../../context/LanguageContext'
-import { api } from '../../lib/api'
+import { api, proofSrc } from '../../lib/api'
 import { formatDateTime, formatMoney } from '../../lib/format'
 import { StatusProgress } from './PortalHome'
 
@@ -180,7 +180,7 @@ export default function PortalOrderDetail() {
           {order.deliveryProofUrl && (
             <button type="button" onClick={() => setProofOpen(true)}>
               <img
-                src={order.deliveryProofUrl}
+                src={proofSrc(order.deliveryProofUrl)}
                 alt={t('Баталгаажуулах зураг')}
                 className="h-24 rounded border border-rule hover:opacity-80 transition-opacity"
               />
@@ -266,7 +266,7 @@ export default function PortalOrderDetail() {
       >
         {order.deliveryProofUrl && (
           <img
-            src={order.deliveryProofUrl}
+            src={proofSrc(order.deliveryProofUrl)}
             alt={t('Баталгаажуулах зураг')}
             className="w-full rounded"
           />

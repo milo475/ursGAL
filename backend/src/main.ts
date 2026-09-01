@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { mkdirSync } from 'node:fs';
+import type { ServerResponse } from 'node:http';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -10,6 +11,13 @@ async function bootstrap() {
   mkdirSync(UPLOADS_DIR, { recursive: true });
 
   const app = await NestFactory.create(AppModule);
+
+  // Бүх response-д content-sniffing хамгаалалт (R-2 / Y-1). Хуурамч
+  // MIME-тэй файлыг браузер өөрөө "тааж" өөр төрлөөр гүйцэтгэхээс сэргийлнэ.
+  app.use((_req, res: ServerResponse, next: () => void) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    next();
+  });
 
   app.setGlobalPrefix('api');
   app.useGlobalPipes(

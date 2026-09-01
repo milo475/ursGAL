@@ -29,7 +29,7 @@ import { ReportsModule } from './reports/reports.module';
 import { SettingsModule } from './settings/settings.module';
 import { ProductsModule } from './products/products.module';
 import { StockModule } from './stock/stock.module';
-import { UPLOADS_DIR } from './uploads.config';
+import { UploadsModule } from './media/uploads.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -39,32 +39,27 @@ import { UsersModule } from './users/users.module';
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 1000 }]),
     // frontend/dist-ийг нэг порт дээрээс serve хийнэ:
     // /api/* backend-д, бусад бүх зам SPA-ийн index.html руу.
-    // uploads/ — хүргэлтийн баталгаажуулах зургууд /api/uploads/* дээр.
-    ServeStaticModule.forRoot(
-      {
-        rootPath: join(__dirname, '..', '..', 'frontend', 'dist'),
-        exclude: ['/api/{*path}'],
-        serveStaticOptions: {
-          setHeaders: (res: ServerResponse, path: string) => {
-            if (path.endsWith('.html')) {
-              // index.html хэзээ ч cache-лэгдэхгүй — шинэ build шууд очно
-              res.setHeader('Cache-Control', 'no-store');
-            } else if (path.includes('/assets/')) {
-              // hash-тай asset-ууд — урт хугацааны cache
-              res.setHeader(
-                'Cache-Control',
-                'public, max-age=31536000, immutable',
-              );
-            }
-          },
+    // uploads/ — баталгаажуулах зургууд ОДОО задгай ServeStatic-ээр БИШ,
+    // эрхийн шалгалттай UploadsController (/api/uploads/:filename)-оор
+    // очно (R-1). Тиймээс энд зөвхөн frontend/dist-ийг serve хийнэ.
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'frontend', 'dist'),
+      exclude: ['/api/{*path}'],
+      serveStaticOptions: {
+        setHeaders: (res: ServerResponse, path: string) => {
+          if (path.endsWith('.html')) {
+            // index.html хэзээ ч cache-лэгдэхгүй — шинэ build шууд очно
+            res.setHeader('Cache-Control', 'no-store');
+          } else if (path.includes('/assets/')) {
+            // hash-тай asset-ууд — урт хугацааны cache
+            res.setHeader(
+              'Cache-Control',
+              'public, max-age=31536000, immutable',
+            );
+          }
         },
       },
-      {
-        rootPath: UPLOADS_DIR, // .env-ийн UPLOADS_DIR эсвэл backend/uploads
-        serveRoot: '/api/uploads',
-        serveStaticOptions: { index: false },
-      },
-    ),
+    }),
     PrismaModule,
     PermissionsModule,
     AuthModule,
@@ -84,6 +79,7 @@ import { UsersModule } from './users/users.module';
     ReportsModule,
     UsersModule,
     LoggingModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [

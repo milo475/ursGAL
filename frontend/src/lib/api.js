@@ -43,6 +43,18 @@ export function getAccessToken() {
   return accessToken
 }
 
+/**
+ * Баталгаажуулах зургийн эрх хамгаалалттай URL (R-1).
+ * <img> таг Authorization header илгээдэггүй тул access token-ыг query-гээр
+ * залгаж өгнө — сервер талд /api/uploads/:filename эрхийг шалгана.
+ */
+export function proofSrc(url) {
+  if (!url) return url
+  return accessToken
+    ? `${url}${url.includes('?') ? '&' : '?'}token=${encodeURIComponent(accessToken)}`
+    : url
+}
+
 function normalizeError(status, payload) {
   let message = 'Алдаа гарлаа'
   if (payload && payload.message) {

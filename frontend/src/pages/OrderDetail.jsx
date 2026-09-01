@@ -15,7 +15,7 @@ import Modal from '../components/ui/Modal'
 import { useToast } from '../components/ui/Toast'
 import { useLang } from '../context/LanguageContext'
 import { useAuth } from '../context/AuthContext'
-import { api } from '../lib/api'
+import { api, proofSrc } from '../lib/api'
 import { formatDateTime, formatMoney } from '../lib/format'
 import { openPickingSheet } from '../lib/pickingSheet'
 import { TRANSITIONS, TRANSITION_LABELS } from '../lib/orderStatus'
@@ -334,7 +334,7 @@ export default function OrderDetail() {
               </p>
               <button type="button" onClick={() => setProofOpen(true)}>
                 <img
-                  src={order.deliveryProofUrl}
+                  src={proofSrc(order.deliveryProofUrl)}
                   alt={t('Баталгаажуулах зураг')}
                   className="h-24 rounded border border-rule hover:opacity-80 transition-opacity"
                 />
@@ -391,7 +391,7 @@ export default function OrderDetail() {
       >
         {order.deliveryProofUrl && (
           <img
-            src={order.deliveryProofUrl}
+            src={proofSrc(order.deliveryProofUrl)}
             alt={t('Баталгаажуулах зураг')}
             className="w-full rounded"
           />
