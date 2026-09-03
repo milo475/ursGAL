@@ -6813,4 +6813,33 @@ describe('ursGAL v2 API (e2e)', () => {
     });
   });
 
+
+  describe('V5: Нэг компанийн горим ⭐', () => {
+    /**
+     * ursGAL бол НЭГ компанийн дотоод систем — гаднаас бүртгүүлэх
+     * зам байх ёсгүй. Хуучин хувилбарт нээлттэй /auth/register
+     * байсныг refactor-оор устгасан; энэ тест дахин нэмэгдэхээс
+     * хамгаална. Хэрэглэгчийг зөвхөн users.manage эрхтэй хүн
+     * (POST /users) үүсгэнэ.
+     */
+    it('нээлттэй бүртгэлийн endpoint байхгүй', async () => {
+      await api()
+        .post('/api/auth/register')
+        .send({ email: `x${T}@a.mn`, password: 'x12345678' })
+        .expect(404);
+      await api()
+        .post('/api/auth/register-org')
+        .send({ name: 'Х' })
+        .expect(404);
+    });
+
+    it('хэрэглэгч үүсгэх нь users.manage эрхтэйд л нээлттэй', async () => {
+      await api()
+        .post('/api/users')
+        .set(auth(tok.seller))
+        .send({ email: `y${T}@a.mn`, password: 'y12345678', name: 'Х', role: 'DRIVER' })
+        .expect(403);
+    });
+  });
+
 });
