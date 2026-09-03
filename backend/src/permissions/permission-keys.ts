@@ -19,6 +19,14 @@ export const PERM = {
    * (PREPARING→READY) байх боловч цуцлахгүй.
    */
   ORDERS_CANCEL: 'orders.cancel',
+  /**
+   * Захиалгын төлбөр бүртгэх (V5) — least-privilege түлхүүр.
+   * Өмнө нь борлуулагчид өргөн finance.create_income олгогдож байсан
+   * нь захиалгатай холбоогүй ДУРЫН орлогын бичилт үүсгэх эрхийг
+   * давхар өгдөг байв. Энэ түлхүүр зөвхөн захиалга дээрх төлбөрийн
+   * бүртгэл (нэмэх/алдаатайг устгах)-д үйлчилнэ.
+   */
+  ORDERS_RECORD_PAYMENT: 'orders.record_payment',
   ORDERS_REFUND: 'orders.refund',
   ORDERS_ASSIGN_WAREHOUSE: 'orders.assign_warehouse',
   WAREHOUSE_HANDOVER: 'warehouse.handover',
@@ -92,6 +100,7 @@ export const PERM_LABELS: Record<PermKey, string> = {
   [PERM.ORDERS_CHANGE_STATUS]: 'Захиалгын статус солих',
   [PERM.ORDERS_EDIT]: 'Захиалга засах (хаяг, бараа)',
   [PERM.ORDERS_CANCEL]: 'Захиалга цуцлах',
+  [PERM.ORDERS_RECORD_PAYMENT]: 'Захиалгын төлбөр бүртгэх',
   [PERM.ORDERS_REFUND]: 'Буцаалт бүртгэх',
   [PERM.ORDERS_ASSIGN_WAREHOUSE]: 'Нярав хуваарилах',
   [PERM.WAREHOUSE_HANDOVER]: 'Жолоочид хүлээлгэн өгөх',
@@ -137,6 +146,7 @@ export const PERM_GROUPS: { group: string; keys: PermKey[] }[] = [
       PERM.ORDERS_CHANGE_STATUS,
       PERM.ORDERS_EDIT,
       PERM.ORDERS_CANCEL,
+      PERM.ORDERS_RECORD_PAYMENT,
       PERM.ORDERS_REFUND,
       PERM.ORDERS_ASSIGN_WAREHOUSE,
       PERM.WAREHOUSE_HANDOVER,
@@ -282,7 +292,12 @@ export const ROLE_DEFAULTS: Record<Role, PermKey[]> = {
     PERM.ORDERS_ASSIGN_WAREHOUSE,
     // Гүйлгээний баримтыг ШАЛГАДАГ нь борлуулагч — дараа орсон
     // мөнгийг бүртгэхийн тулд менежер рүү явах шаардлагагүй
-    PERM.FINANCE_CREATE_INCOME,
+    /**
+     * V5: finance.create_income-ийг orders.record_payment-ээр СОЛИВ.
+     * Өргөн түлхүүр нь /finance/entries дээр дурын орлогын бичилт
+     * үүсгэх эрхийг давхар өгдөг байсан — борлуулагчид хэрэггүй.
+     */
+    PERM.ORDERS_RECORD_PAYMENT,
     PERM.CUSTOMERS_VIEW,
     PERM.INVENTORY_VIEW,
     PERM.DRIVERS_VIEW,
