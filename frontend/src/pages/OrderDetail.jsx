@@ -522,9 +522,7 @@ function PaymentSection({ order, onChanged, t, toast, hasPerm }) {
   const [error, setError] = useState(null)
   const [deleting, setDeleting] = useState(null) // устгах гэж буй төлбөр
 
-  // Санхүүгийн өргөн эрх ЭСВЭЛ борлуулагчийн нарийн түлхүүр (V5)
-  const canPay =
-    hasPerm('finance.create_income') || hasPerm('orders.record_payment')
+  const canPay = hasPerm('finance.create_income')
   const remaining =
     Number(order.totalAmount) - Number(order.paidAmount ?? 0)
 

@@ -17,10 +17,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { AuthUser } from '../auth/decorators/current-user.decorator';
 import { PaymentMethod } from '../generated/prisma/client';
 import { PERM } from '../permissions/permission-keys';
-import {
-  RequireAnyPermission,
-  RequirePermission,
-} from '../permissions/require-permission.decorator';
+import { RequirePermission } from '../permissions/require-permission.decorator';
 import { PaymentsService } from './payments.service';
 
 class CreatePaymentDto {
@@ -42,13 +39,8 @@ class CreatePaymentDto {
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
-  /**
-   * Аль нэг нь хангалттай (V5): finance.create_income нь санхүүгийн
-   * ажилтных, orders.record_payment нь борлуулагчийн least-privilege
-   * түлхүүр — захиалгын төлбөрөөс өөр юунд ч хүрэхгүй.
-   */
   @Post('orders/:id/payments')
-  @RequireAnyPermission(PERM.FINANCE_CREATE_INCOME, PERM.ORDERS_RECORD_PAYMENT)
+  @RequirePermission(PERM.FINANCE_CREATE_INCOME)
   addPayment(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: CreatePaymentDto,
@@ -57,13 +49,8 @@ export class PaymentsController {
     return this.paymentsService.addPayment(id, dto, user);
   }
 
-  /**
-   * Устгал ч мөн адил (V5): бүртгэсэн хүн алдаатай бичилтээ өөрөө
-   * засаж чадахгүй бол болгон дээр менежер дуудагдана. Устгал бүр
-   * ActivityLog-д бичигддэг тул мөр сураггүй алга болохгүй.
-   */
   @Delete('payments/:id')
-  @RequireAnyPermission(PERM.FINANCE_CREATE_INCOME, PERM.ORDERS_RECORD_PAYMENT)
+  @RequirePermission(PERM.FINANCE_CREATE_INCOME)
   deletePayment(@Param('id', ParseUUIDPipe) id: string) {
     return this.paymentsService.deletePayment(id);
   }
