@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
+import { BrowserRouter, Route, Routes } from 'react-router'
 import PermRoute from './components/auth/PermRoute'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import RoleRoute from './components/auth/RoleRoute'
@@ -154,11 +154,6 @@ function App() {
                     </Route>
                   </Route>
                 </Route>
-
-                {/* Танигдаагүй зам → нүүр (V5). Өмнө нь ХООСОН цагаан
-                    хуудас гарч, гарах гарцгүй байв. Нэвтрээгүй бол
-                    доторх auth хамгаалалт /login руу аваачна. */}
-                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </BrowserRouter>
           </ToastProvider>
