@@ -1,12 +1,10 @@
-import {
-  IsNotEmpty,
-  IsString,
-  MaxLength,
-} from 'class-validator';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class RefreshDto {
   @IsString()
-  @IsNotEmpty({ message: 'refreshToken шаардлагатай' })
+  // V5: httpOnly cookie-гоор ирэх үед body хоосон байж болно —
+  // controller cookie-г уншина. Аль нь ч байхгүй бол service 401 өгнө.
+  @IsOptional()
   @MaxLength(1000)
-  refreshToken: string;
+  refreshToken?: string;
 }

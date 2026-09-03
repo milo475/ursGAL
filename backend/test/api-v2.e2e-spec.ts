@@ -3199,8 +3199,15 @@ describe('ursGAL v2 API (e2e)', () => {
         rejectData = j;
       });
 
+      // V5: stream нь access token биш БОГИНО НАСЖИЛТТАЙ тасалбараар
+      // нээгдэнэ — токен URL-д орж лог/proxy-д үлдэхээс сэргийлсэн
+      const tk = await api()
+        .get('/api/notifications/stream-ticket')
+        .set(auth(tok.driver))
+        .expect(200);
+
       const req = httpGet(
-        `http://127.0.0.1:${port}/api/notifications/stream?token=${encodeURIComponent(tok.driver)}`,
+        `http://127.0.0.1:${port}/api/notifications/stream?ticket=${encodeURIComponent(tk.body.ticket)}`,
         (res) => {
           expect(res.statusCode).toBe(200);
           expect(res.headers['content-type']).toContain('text/event-stream');
@@ -3230,10 +3237,12 @@ describe('ursGAL v2 API (e2e)', () => {
       req.destroy();
       expect(chunk).toContain('"type":"notification"');
 
-      // Буруу token → stream нээгдэлгүй алдаа буцна
+      // Буруу тасалбар → нээгдэхгүй; мөн ЖИНХЭНЭ access token ч
+      // хүлээж авахгүй (purpose='sse' биш) — задарсан токеноор stream
+      // нээх боломжгүй гэдгийн баталгаа
       await new Promise<void>((resolve) => {
         const bad = httpGet(
-          `http://127.0.0.1:${port}/api/notifications/stream?token=bad-token`,
+          `http://127.0.0.1:${port}/api/notifications/stream?ticket=${encodeURIComponent(tok.driver)}`,
           (res) => {
             expect(res.statusCode).toBeGreaterThanOrEqual(400);
             bad.destroy();
@@ -6839,6 +6848,171 @@ describe('ursGAL v2 API (e2e)', () => {
         .set(auth(tok.seller))
         .send({ email: `y${T}@a.mn`, password: 'y12345678', name: 'Х', role: 'DRIVER' })
         .expect(403);
+    });
+  });
+
+
+  describe('V5: Аудитын засварууд — мөнгө, CSV, cookie ⭐', () => {
+    let auditProdId: string;
+    let auditOrdId: string;
+    let csvOrdId: string;
+
+    afterAll(async () => {
+      for (const oid of [auditOrdId, csvOrdId].filter(Boolean)) {
+        await prisma.financeEntry.deleteMany({ where: { refOrderId: oid } });
+        await prisma.payment.deleteMany({ where: { orderId: oid } });
+        await prisma.notification.deleteMany({ where: { refId: oid } });
+        await prisma.orderItem.deleteMany({ where: { orderId: oid } });
+        await prisma.order.deleteMany({ where: { id: oid } });
+      }
+      if (auditProdId) {
+        await prisma.stockMovement.deleteMany({
+          where: { productId: auditProdId },
+        });
+        await prisma.product.deleteMany({ where: { id: auditProdId } });
+      }
+    });
+
+    it('бэлтгэл', async () => {
+      const prod = await api()
+        .post('/api/products')
+        .set(auth(tok.admin))
+        .send({ sku: `${SKU}-AUD`, name: `Э2Э Аудит ${T}`, price: '10000' })
+        .expect(201);
+      auditProdId = prod.body.id;
+      await api()
+        .post('/api/stock/adjust')
+        .set(auth(tok.admin))
+        .send({ productId: auditProdId, qtyChange: 20, reason: 'PURCHASE_IN' })
+        .expect(201);
+    });
+
+    /**
+     * ⭐ №1: 100,000₮ төлсөн захиалгыг 50,000₮ болтол засахад төлөв
+     * ТӨЛСӨН хэвээр үлдэж, илүү мөнгө хаана ч харагдахгүй «алга
+     * болдог» байв. Цуцлалтад ижил хамгаалалт байсан — засварт
+     * дутуу байсныг нөхсөн.
+     */
+    it('төлснөөс доош буулгах засвар хориглогдоно', async () => {
+      const o = await api()
+        .post('/api/orders')
+        .set(auth(tok.admin))
+        .send({
+          customerName: `Э2Э ТөлсөнЗасвар ${T}`,
+          customerPhone: `9${T}`,
+          ...UB_ADDR,
+          items: [{ productId: auditProdId, qty: 2 }],
+          paid: true,
+        })
+        .expect(201);
+      auditOrdId = o.body.id;
+      expect(o.body.paymentStatus).toBe('PAID');
+
+      const res = await api()
+        .patch(`/api/orders/${auditOrdId}`)
+        .set(auth(tok.admin))
+        .send({ items: [{ productId: auditProdId, qty: 1 }] })
+        .expect(400);
+      expect(res.body.message).toContain('Төлсөн дүн');
+
+      // Байдал ХӨНДӨГДӨӨГҮЙ үлдэнэ
+      const after = await api()
+        .get(`/api/orders/${auditOrdId}`)
+        .set(auth(tok.admin))
+        .expect(200);
+      expect(after.body.totalAmount).toBe('20000');
+      expect(after.body.paidAmount).toBe('20000');
+    });
+
+    it('дээш нэмэх засвар чөлөөтэй — төлөв PARTIAL болно', async () => {
+      const res = await api()
+        .patch(`/api/orders/${auditOrdId}`)
+        .set(auth(tok.admin))
+        .send({ items: [{ productId: auditProdId, qty: 3 }] })
+        .expect(200);
+      expect(res.body.paymentStatus).toBe('PARTIAL');
+    });
+
+    /**
+     * ⭐ №2: үйлчлүүлэгч нэрээ формулаар өгвөл ажилтны Excel дээр
+     * АЖИЛЛАДАГ байв (давхар хашилт хамгаалдаггүй). Одоо ' угтвартай
+     * саармагжина; жинхэнэ сөрөг тоо хөндөгдөхгүй.
+     */
+    it('CSV формула саармагжиж, сөрөг тоо хэвээр', async () => {
+      const o = await api()
+        .post('/api/orders')
+        .set(auth(tok.admin))
+        .send({
+          customerName: '=HYPERLINK("http://evil.mn","x")',
+          customerPhone: `9${T}`,
+          ...UB_ADDR,
+          items: [{ productId: auditProdId, qty: 1 }],
+        })
+        .expect(201);
+      csvOrdId = o.body.id;
+
+      const csv = await api()
+        .get('/api/reports/delivery.csv')
+        .set(auth(tok.admin))
+        .expect(200);
+      const line = csv.text
+        .split('\n')
+        .find((l: string) => l.includes('HYPERLINK'));
+      expect(line).toBeDefined();
+      // Форматаас үл хамааран =-ийн өмнө ' зогсоно
+      expect(line!.replace(/"/g, '')).toContain("'=HYPERLINK");
+
+      // Орлого тайлангийн сөрөг дүн ' авахгүй (Excel-д тоо хэвээр)
+      const pnl = await api()
+        .get('/api/reports/pnl.csv')
+        .set(auth(tok.admin))
+        .expect(200);
+      expect(pnl.text).toMatch(/,-\d/);
+      expect(pnl.text).not.toContain("'-");
+    });
+
+    /**
+     * ⭐ №6: refresh token одоо httpOnly cookie-гоор — localStorage-д
+     * хадгалагдсан token-ыг XSS уншдаг байсан бол cookie-д JS хүрэхгүй.
+     * Body-гийн зам хуучин гэрээгээрээ ажилласаар (тест, скрипт).
+     */
+    it('login нь httpOnly refresh cookie тавьдаг', async () => {
+      const res = await api()
+        .post('/api/auth/login')
+        .send({ email: 'manager@ursgal.mn', password: 'manager123' })
+        .expect(200);
+      const cookies = res.headers['set-cookie'] as unknown as string[];
+      const rt = (cookies ?? []).find((c) => c.startsWith('ursgal_rt='));
+      expect(rt).toBeDefined();
+      expect(rt).toContain('HttpOnly');
+      expect(rt!.toLowerCase()).toContain('samesite=strict');
+      expect(rt).toContain('Path=/api/auth');
+    });
+
+    it('cookie-гоор ГАНЦААРАА refresh хийгдэнэ (body хоосон)', async () => {
+      const login = await api()
+        .post('/api/auth/login')
+        .send({ email: 'manager@ursgal.mn', password: 'manager123' })
+        .expect(200);
+      const cookie = (login.headers['set-cookie'] as unknown as string[])
+        .find((c) => c.startsWith('ursgal_rt='))!
+        .split(';')[0];
+
+      const res = await api()
+        .post('/api/auth/refresh')
+        .set('Cookie', cookie)
+        .send({})
+        .expect(200);
+      expect(res.body.accessToken).toBeTruthy();
+      // Rotation: шинэ cookie дахин тавигдана
+      const again = (res.headers['set-cookie'] as unknown as string[]).find(
+        (c) => c.startsWith('ursgal_rt='),
+      );
+      expect(again).toBeDefined();
+    });
+
+    it('cookie ч, body ч байхгүй бол 401', async () => {
+      await api().post('/api/auth/refresh').send({}).expect(401);
     });
   });
 

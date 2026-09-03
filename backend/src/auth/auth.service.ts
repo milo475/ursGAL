@@ -117,9 +117,15 @@ export class AuthService {
    */
   async refresh(dto: RefreshDto) {
     const invalid = new UnauthorizedException('Refresh token хүчингүй');
+    // V5: cookie-гоос ирэхэд body хоосон байж болно — controller
+    // cookie-г уншиж дамжуулдаг; энд хоосон бол шууд 401
+    const token = dto.refreshToken;
+    if (!token) {
+      throw invalid;
+    }
     let payload: JwtPayload;
     try {
-      payload = await this.jwt.verifyAsync<JwtPayload>(dto.refreshToken, {
+      payload = await this.jwt.verifyAsync<JwtPayload>(token, {
         secret: process.env.JWT_REFRESH_SECRET,
       });
     } catch {
@@ -132,7 +138,7 @@ export class AuthService {
     const record = await this.prisma.refreshToken.findUnique({
       where: { id: payload.jti },
     });
-    if (!record || record.tokenHash !== sha256(dto.refreshToken)) {
+    if (!record || record.tokenHash !== sha256(token)) {
       throw invalid;
     }
     if (record.revokedAt) {

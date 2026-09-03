@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
@@ -18,7 +19,12 @@ import { Public } from './decorators/public.decorator';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
+import {
+  clearRefreshCookie,
+  readRefreshCookie,
+  setRefreshCookie,
+} from './refresh-cookie.util';
 
 // Rate limit (V4-07): IP тутамд login 5/мин.
 // Тест орчинд AUTH_RATE_LIMIT env-ээр өндөр лимит тавьдаг.
@@ -42,31 +48,58 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: LOGIN_LIMIT, ttl: 60_000 } })
-  login(@Body() dto: LoginDto, @Req() req: Request) {
+  async login(
+    @Body() dto: LoginDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     // IP нь амжилтгүй оролдлогын бүртгэлд ордог — довтолгоо нэг эх
     // сурвалжаас ирж буйг таних гол мэдээлэл (V5)
-    return this.authService.login(
+    const result = await this.authService.login(
       dto,
       req.ip ?? null,
       req.get('user-agent') ?? null,
     );
+    setRefreshCookie(res, result.refreshToken);
+    return result;
   }
 
 
+  /**
+   * Refresh token-ыг BODY эсвэл httpOnly COOKIE-гоос авна (V5).
+   *
+   * Cookie нь үндсэн зам: localStorage-д хадгалагдсан token-ыг XSS
+   * уншиж чаддаг байсан бол httpOnly cookie-д JS огт хүрэхгүй.
+   * CSRF-ээс SameSite=Strict хамгаална (гадны сайтаас илгээгдэхгүй).
+   * Body нь API-гийн хуучин гэрээ тул хэвээр (тест, скрипт).
+   */
   @Public()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: REFRESH_LIMIT, ttl: 60_000 } })
-  refresh(@Body() dto: RefreshDto) {
-    return this.authService.refresh(dto);
+  async refresh(
+    @Body() dto: RefreshDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token = dto.refreshToken || readRefreshCookie(req);
+    const result = await this.authService.refresh({ refreshToken: token ?? '' });
+    setRefreshCookie(res, result.refreshToken);
+    return result;
   }
 
-  /** V4-08: гарахад refresh token revoke хийгдэнэ */
+  /** V4-08: гарахад refresh token revoke хийгдэж, cookie арилна */
   @Post('logout')
   @AllowTempPassword()
   @HttpCode(HttpStatus.OK)
-  logout(@Body() dto: RefreshDto) {
-    return this.authService.logout(dto.refreshToken);
+  logout(
+    @Body() dto: RefreshDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token = dto.refreshToken || readRefreshCookie(req);
+    clearRefreshCookie(res);
+    return this.authService.logout(token ?? '');
   }
 
   /** V4-06: түр нууц үгээ солино — mustChangePassword үед ганц нээлттэй үйлдэл */

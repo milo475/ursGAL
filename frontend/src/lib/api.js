@@ -20,10 +20,16 @@ let accessToken = null
 
 export function setTokens(data) {
   accessToken = data.accessToken ?? null
+  /**
+   * V5: refresh token localStorage-д ХАДГАЛАГДАХАА БОЛЬСОН.
+   * Сервер түүнийг httpOnly cookie-гоор өгдөг болсон — JS огт хүрч
+   * чадахгүй тул XSS амжилттай болсон ч 7 хоногийн session хулгайд
+   * алдагдахгүй. Хуучин хадгалагдсан утгыг цэвэрлэнэ (шилжилт).
+   */
   try {
-    if (data.refreshToken) localStorage.setItem(REFRESH_KEY, data.refreshToken)
+    localStorage.removeItem(REFRESH_KEY)
   } catch {
-    /* localStorage боломжгүй орчинд session refresh-гүй үргэлжилнэ */
+    /* үл тоомсорлоно */
   }
 }
 
@@ -95,11 +101,13 @@ let refreshPromise = null
 async function tryRefresh() {
   if (!refreshPromise) {
     refreshPromise = (async () => {
-      const refreshToken = getRefreshToken()
-      if (!refreshToken) return null
+      // Cookie нь хүсэлттэй хамт өөрөө явна (same-origin). Хуучин
+      // localStorage-д үлдсэн token байвал body-гоор нэг удаа өгнө —
+      // амжилттай болмогц сервер cookie тавьж, бид устгана.
+      const legacy = getRefreshToken()
       const { res, payload } = await rawRequest('/auth/refresh', {
         method: 'POST',
-        body: { refreshToken },
+        body: legacy ? { refreshToken: legacy } : {},
       })
       if (!res.ok) return null
       setTokens(payload)
@@ -145,10 +153,15 @@ export async function restoreSession() {
  * Алдаа гарсан ч гарах үйлдлийг саатуулахгүй.
  */
 export async function serverLogout() {
-  const refreshToken = getRefreshToken()
-  if (!refreshToken) return
+  // V5: token нь httpOnly cookie-д тул body ихэвчлэн хоосон — сервер
+  // cookie-гоо уншиж revoke хийгээд арилгана. Хуучин localStorage-ийн
+  // үлдэц байвал хамт явуулна.
+  const legacy = getRefreshToken()
   try {
-    await rawRequest('/auth/logout', { method: 'POST', body: { refreshToken } })
+    await rawRequest('/auth/logout', {
+      method: 'POST',
+      body: legacy ? { refreshToken: legacy } : {},
+    })
   } catch {
     /* сүлжээгүй үед ч local гарах үргэлжилнэ */
   }

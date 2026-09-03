@@ -5,6 +5,7 @@ import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ActivityLogInterceptor } from './activity-log/activity-log.interceptor';
 import { ActivityLogModule } from './activity-log/activity-log.module';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthThrottlerGuard } from './auth/guards/auth-throttler.guard';
@@ -151,6 +152,10 @@ export class AppModule implements NestModule {
    * Модулийн middleware болгосноор хаана ч ажиллана.
    */
   configure(consumer: MiddlewareConsumer) {
+    // cookie-parser ЭНД (main.ts-д биш): bootstrap дахь app.use() нь
+    // тест орчинд ажилладаггүй тул refresh cookie тестээр баригдахгүй
+    // байх байсан — helmet-тэй ижил шалтгаан (V5)
+    consumer.apply(cookieParser()).forRoutes('*');
     consumer
       .apply(
         helmet({

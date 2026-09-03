@@ -92,14 +92,27 @@ export default function AppShell() {
     let retry = null
     let stopped = false
 
-    const connect = () => {
+    /**
+     * Stream-д ACCESS TOKEN биш богино насжилттай ТАСАЛБАР явна (V5):
+     * access token URL-д орвол сервер/proxy-ийн логт үлдэж болзошгүй
+     * байв. Тасалбар 60 сек амьдардаг, зөвхөн stream нээж чадна.
+     */
+    const connect = async () => {
       const token = getAccessToken()
       if (!token) {
         retry = setTimeout(connect, 5000)
         return
       }
+      let ticket
+      try {
+        ;({ ticket } = await api('/notifications/stream-ticket'))
+      } catch {
+        if (!stopped) retry = setTimeout(connect, 5000)
+        return
+      }
+      if (stopped) return
       es = new EventSource(
-        `${API_BASE}/notifications/stream?token=${encodeURIComponent(token)}`,
+        `${API_BASE}/notifications/stream?ticket=${encodeURIComponent(ticket)}`,
       )
       es.onmessage = (e) => {
         try {

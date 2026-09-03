@@ -50,29 +50,49 @@ export class NotificationsController {
   ) {}
 
   /**
-   * SSE stream (V4-09). EventSource header дэмждэггүй тул access token
-   * query param-аар ирж энд гараар шалгагдана (@Public — global guard
-   * header шаарддаг). Token хүчингүй бол stream алдаагаар хаагдаж
-   * frontend хэсэг хугацааны дараа шинэ token-оор дахин холбогдоно.
+   * Stream-ийн ТАСАЛБАР (V5).
+   *
+   * EventSource header дэмждэггүй тул ямар нэг зүйл query-гээр явахаас
+   * аргагүй. Өмнө нь 15 минут хүчинтэй ACCESS TOKEN явдаг байсан нь
+   * сервер/proxy-ийн логт үлдэж болзошгүй байв — тэр токеноор БҮХ API
+   * нээгддэг.
+   *
+   * Одоо ердийн header-ээр нэвтэрч тасалбар авна: 60 секунд амьдардаг,
+   * purpose='sse' тул stream нээхээс өөр ЮУНД Ч хэрэглэгдэхгүй.
+   * Логт үлдсэн ч ашиглах цонх нь хэдхэн секунд.
    */
+  @Get('stream-ticket')
+  async streamTicket(@CurrentUser() user: AuthUser) {
+    const ticket = await this.jwt.signAsync(
+      { sub: user.id, purpose: 'sse' },
+      { secret: process.env.JWT_SECRET, expiresIn: '60s' },
+    );
+    return { ticket };
+  }
+
+  /** SSE stream (V4-09) — зөвхөн дээрх тасалбараар нээгдэнэ */
   @Public()
   @Sse('stream')
-  stream(@Query('token') token: string): Observable<SseEvent> {
+  stream(@Query('ticket') ticket: string): Observable<SseEvent> {
     return defer(async () => {
-      let payload: JwtPayload;
+      let payload: JwtPayload & { purpose?: string };
       try {
-        payload = await this.jwt.verifyAsync<JwtPayload>(token ?? '', {
+        payload = await this.jwt.verifyAsync(ticket ?? '', {
           secret: process.env.JWT_SECRET,
         });
       } catch {
-        throw new UnauthorizedException('Stream token хүчингүй');
+        throw new UnauthorizedException('Stream ticket хүчингүй');
+      }
+      // Ердийн access token-ыг ЭНД хүлээж авахгүй — тасалбар л байна
+      if (payload.purpose !== 'sse') {
+        throw new UnauthorizedException('Stream ticket хүчингүй');
       }
       const user = await this.prisma.user.findUnique({
         where: { id: payload.sub },
         select: { id: true, isActive: true },
       });
       if (!user?.isActive) {
-        throw new UnauthorizedException('Stream token хүчингүй');
+        throw new UnauthorizedException('Stream ticket хүчингүй');
       }
       return user.id;
     }).pipe(switchMap((userId) => this.notificationsService.subscribe(userId)));
