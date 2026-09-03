@@ -1188,7 +1188,9 @@ describe('ursGAL v2 API (e2e)', () => {
       }
       // Панелын түлхүүр бүр backend-ийн ямар нэг route-д хэрэглэгддэг
       // (V5-д нярав нэмэгдэхэд +2: orders.assign_warehouse, warehouse.handover)
-      expect(allKeys).toHaveLength(33);
+      // V5: orders.record_payment нэмэгдэв (борлуулагчийн least-privilege)
+      expect(allKeys).toHaveLength(34);
+      expect(allKeys).toContain('orders.record_payment');
       expect(allKeys).toContain('drivers.zones');
       expect(allKeys).toContain('orders.cancel');
       expect(allKeys).toContain('supplies.create');
@@ -6689,6 +6691,125 @@ describe('ursGAL v2 API (e2e)', () => {
       expect(
         await prisma.loginHistory.count({ where: { userId: histUserId } }),
       ).toBe(before);
+    });
+  });
+
+
+  describe('V5: orders.record_payment — нарийн эрх ⭐', () => {
+    let payProdId: string;
+    let payOrdId: string;
+    let paymentId: string;
+
+    afterAll(async () => {
+      if (payOrdId) {
+        await prisma.financeEntry.deleteMany({ where: { refOrderId: payOrdId } });
+        await prisma.payment.deleteMany({ where: { orderId: payOrdId } });
+        await prisma.notification.deleteMany({ where: { refId: payOrdId } });
+        await prisma.orderItem.deleteMany({ where: { orderId: payOrdId } });
+        await prisma.order.deleteMany({ where: { id: payOrdId } });
+      }
+      if (payProdId) {
+        await prisma.stockMovement.deleteMany({ where: { productId: payProdId } });
+        await prisma.product.deleteMany({ where: { id: payProdId } });
+      }
+    });
+
+    it('бэлтгэл — төлөөгүй захиалга', async () => {
+      const prod = await api()
+        .post('/api/products')
+        .set(auth(tok.admin))
+        .send({ sku: `${SKU}-RP`, name: `Э2Э Төлбөрийн эрх ${T}`, price: '8000' })
+        .expect(201);
+      payProdId = prod.body.id;
+      await api()
+        .post('/api/stock/adjust')
+        .set(auth(tok.admin))
+        .send({ productId: payProdId, qtyChange: 5, reason: 'PURCHASE_IN' })
+        .expect(201);
+      const o = await api()
+        .post('/api/orders')
+        .set(auth(tok.admin))
+        .send({
+          customerName: `Э2Э ТөлбөрЭрх ${T}`,
+          customerPhone: `9${T}`,
+          ...UB_ADDR,
+          items: [{ productId: payProdId, qty: 1 }],
+        })
+        .expect(201);
+      payOrdId = o.body.id;
+    });
+
+    /**
+     * ⭐ Борлуулагч захиалгын төлбөр бүртгэж чадна — гэхдээ өргөн
+     * finance.create_income-оор БИШ, нарийн orders.record_payment-ээр.
+     */
+    it('борлуулагч захиалгын төлбөр бүртгэнэ', async () => {
+      const res = await api()
+        .post(`/api/orders/${payOrdId}/payments`)
+        .set(auth(tok.seller))
+        .send({ amount: '8000', method: 'TRANSFER' })
+        .expect(201);
+      paymentId = res.body.id;
+      expect(res.body.order.paymentStatus).toBe('PAID');
+    });
+
+    /**
+     * ⭐ ЭРХ ӨРГӨСӨӨГҮЙГ БАТЛАХ: борлуулагч санхүүгийн бусад
+     * endpoint-д хүрч чадахгүй хэвээр. Өмнө нь finance.create_income
+     * байсан үед энэ хүсэлт 201 болдог байсан — одоо 403.
+     */
+    it('борлуулагч ДУРЫН орлогын бичилт үүсгэж чадахгүй', async () => {
+      await api()
+        .post('/api/finance/entries')
+        .set(auth(tok.seller))
+        .send({ type: 'INCOME', category: 'OTHER_INCOME', amount: '5000' })
+        .expect(403);
+    });
+
+    it('борлуулагч алдаатай бүртгэлээ өөрөө устгаж чадна', async () => {
+      await api()
+        .delete(`/api/payments/${paymentId}`)
+        .set(auth(tok.seller))
+        .expect(200);
+      const order = await prisma.order.findUniqueOrThrow({
+        where: { id: payOrdId },
+      });
+      expect(Number(order.paidAmount)).toBe(0);
+    });
+
+    it('жолооч төлбөр бүртгэж чадахгүй', async () => {
+      await api()
+        .post(`/api/orders/${payOrdId}/payments`)
+        .set(auth(tok.driver))
+        .send({ amount: '8000', method: 'TRANSFER' })
+        .expect(403);
+    });
+
+    it('менежер finance.create_income-оороо мөн бүртгэж чадна (OR)', async () => {
+      const res = await api()
+        .post(`/api/orders/${payOrdId}/payments`)
+        .set(auth(tok.manager))
+        .send({ amount: '8000', method: 'TRANSFER' })
+        .expect(201);
+      expect(res.body.order.paymentStatus).toBe('PAID');
+    });
+  });
+
+  describe('V5: Менежер хүлээлгэн өгөлт хийж чадна ⭐', () => {
+    /**
+     * Нярав ажилдаа ирээгүй өдөр хүргэлт зогсохгүйн тулд MANAGER-т
+     * warehouse.handover олгогдсон. Эрх нь ROLE_DEFAULTS-д байгаа ч
+     * бодит endpoint дээр ажилладагийг өнөөг хүртэл тест бариагүй байв.
+     */
+    it('менежер няравын самбар ба хуудсуудад хүрнэ', async () => {
+      await api()
+        .get('/api/warehouse/board')
+        .set(auth(tok.manager))
+        .expect(200);
+      await api()
+        .get('/api/warehouse/handovers')
+        .set(auth(tok.manager))
+        .expect(200);
     });
   });
 
