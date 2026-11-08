@@ -79,7 +79,7 @@ export default function ChangePassword() {
         {/* Шилэн карт: доорх зураг бүдгэрч харагдана (V5).
             `backdrop-blur` нь ард талыг нь бүдгэрүүлдэг тул
             зураг дээр ч текст цэвэр уншигдана. */}
-        <div className="bg-surface/40 backdrop-blur-lg border border-rule/50 rounded-lg p-8 shadow-2xl shadow-black/40">
+        <div className="bg-surface/80 backdrop-blur-lg border border-rule/50 rounded-lg p-8 shadow-2xl shadow-black/40">
           <h1 className="font-serif text-3xl font-medium text-center">
             {t('Шинэ нууц үг зохиох')}
           </h1>

@@ -80,10 +80,10 @@ export default function Login() {
   return (
     <AuthShell>
       <div>
-        {/* Шилэн карт: доорх зураг бүдгэрч харагдана (V5).
+        {/* Шилэн карт: доорх хээ бүдгэрч харагдана.
             `backdrop-blur` нь ард талыг нь бүдгэрүүлдэг тул
-            зураг дээр ч текст цэвэр уншигдана. */}
-        <div className="bg-surface/40 backdrop-blur-lg border border-rule/50 rounded-lg p-8 shadow-2xl shadow-black/40">
+            хээн дээр ч текст цэвэр уншигдана. */}
+        <div className="bg-surface/80 backdrop-blur-lg border border-rule/50 rounded-lg p-8 shadow-2xl shadow-black/40">
           <h1 className="font-serif text-4xl font-medium text-center">ursGAL</h1>
           <p className="mt-2 text-center text-sm text-ink-muted">
             {t('Нөөц ба захиалгын систем')}
