@@ -25,6 +25,7 @@ backups/
 
 # Хүргэлтийн баталгаажуулах зургууд (UPLOADS_DIR default)
 uploads/
+!backend/src/uploads/
 
 # OS / редактор
 .DS_Store
