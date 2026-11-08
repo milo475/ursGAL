@@ -11,7 +11,7 @@
  * 1 борлуулагч, сүүлийн 14 хоногт тархсан 40 захиалга (янз бүрийн
  * статус) + төлбөр/орлого, зарлага, нөөцийн хөдөлгөөн.
  *
- * Демо хэрэглэгч: demo@ursgal.mn / Demo1234 (ADMIN — бүх хуудсыг
+ * Демо хэрэглэгч: demo@ochir.mn / Demo1234 (ADMIN — бүх хуудсыг
  * харна) нь DEMO_READONLY_USERS-ээр ЗӨВХӨН УНШИХ эрхтэй.
  * Бусад хэрэглэгчдийн нууц үг санамсаргүй — хэн ч нэвтэрч чадахгүй.
  */
@@ -30,7 +30,7 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
 
-export const DEMO_USER = { username: 'demo@ursgal.mn', password: 'Demo1234' };
+export const DEMO_USER = { username: 'demo@ochir.mn', password: 'Demo1234' };
 
 /** Тогтмол seed-тэй PRNG — дахин ажиллуулахад ижил өгөгдөл */
 let seed = 20261108;
@@ -81,9 +81,9 @@ const PRODUCTS: [string, (typeof CATEGORIES)[number], number, number, number, nu
 ];
 
 const DRIVERS = [
-  { username: 'driver1@demo.ursgal.mn', fullName: 'Бат-Эрдэнэ Ганбаатар', phone: '88112233', vehicle: 'Мотоцикл · Honda', zones: ['БЗД', 'СБД', 'ЧД'] },
-  { username: 'driver2@demo.ursgal.mn', fullName: 'Төмөрбаатар Энхтайван', phone: '99223344', vehicle: 'Prius 30', zones: ['ХУД', 'БГД'] },
-  { username: 'driver3@demo.ursgal.mn', fullName: 'Ганзориг Мөнхжаргал', phone: '95334455', vehicle: 'Мотоцикл · Yamaha', zones: ['СХД', 'БГД', 'ЧД'] },
+  { username: 'driver1@demo.ochir.mn', fullName: 'Бат-Эрдэнэ Ганбаатар', phone: '88112233', vehicle: 'Мотоцикл · Honda', zones: ['БЗД', 'СБД', 'ЧД'] },
+  { username: 'driver2@demo.ochir.mn', fullName: 'Төмөрбаатар Энхтайван', phone: '99223344', vehicle: 'Prius 30', zones: ['ХУД', 'БГД'] },
+  { username: 'driver3@demo.ochir.mn', fullName: 'Ганзориг Мөнхжаргал', phone: '95334455', vehicle: 'Мотоцикл · Yamaha', zones: ['СХД', 'БГД', 'ЧД'] },
 ];
 
 const NAMES = ['Сараа', 'Номин', 'Анужин', 'Тэмүүлэн', 'Мөнх-Эрдэнэ', 'Солонго', 'Хулан', 'Энхжин', 'Билгүүн', 'Оюунаа', 'Ганболд', 'Нандин', 'Удвал', 'Цэцэгмаа', 'Батзориг', 'Марал', 'Халиун', 'Отгонбаяр'];
@@ -119,9 +119,9 @@ async function main() {
     },
   });
   const seller = await prisma.user.create({
-    data: { username: 'seller@demo.ursgal.mn', passwordHash: await randomHash(), fullName: 'Номин Борлуулагч', role: 'SELLER' },
+    data: { username: 'seller@demo.ochir.mn', passwordHash: await randomHash(), fullName: 'Номин Борлуулагч', role: 'SELLER' },
   });
-  const drivers = [];
+  const drivers: Awaited<ReturnType<typeof prisma.user.create>>[] = [];
   for (const d of DRIVERS) {
     const u = await prisma.user.create({
       data: {
@@ -148,7 +148,7 @@ async function main() {
   const cats = new Map<string, string>();
   for (const name of CATEGORIES) cats.set(name, (await prisma.category.create({ data: { name } })).id);
 
-  const products = [];
+  const products: Awaited<ReturnType<typeof prisma.product.create>>[] = [];
   for (const [i, [name, cat, price, cost, , low]] of PRODUCTS.entries()) {
     products.push(
       await prisma.product.create({

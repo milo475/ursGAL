@@ -4,7 +4,7 @@
  * Дэвсгэр нь зураг ашиглахгүй — бүгд CSS + inline SVG:
  *  1) #0B1220 хар хөхөөс гүн градиент
  *  2) изометрик (30°) шугамын хээ, захаараа бүдгэрнэ
- *  3) баруун доод буланд ursGAL нэрийн бүдэг хээ
+ *  3) баруун доод буланд Ochir нэрийн бүдэг хээ
  * Тиймээс ямар ч гуравдагч брэндийн зураг, нэмэлт файл ачаалахгүй.
  */
 
@@ -52,13 +52,13 @@ export default function AuthShell({ children }) {
     >
       <IsoPattern />
 
-      {/* ursGAL нэрийн бүдэг хээ — зөвхөн том дэлгэцэнд */}
+      {/* Ochir нэрийн бүдэг хээ — зөвхөн том дэлгэцэнд */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-6 -right-4 hidden select-none font-serif text-[180px] leading-none tracking-tight sm:block"
+        className="pointer-events-none absolute -bottom-6 -right-4 hidden select-none font-brand font-bold text-[180px] leading-none tracking-tight sm:block"
         style={{ color: '#7FA6FF', opacity: 0.05 }}
       >
-        ursGAL
+        Ochir
       </span>
 
       <div className="relative w-full max-w-sm">{children}</div>

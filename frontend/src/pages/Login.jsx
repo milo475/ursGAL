@@ -84,9 +84,12 @@ export default function Login() {
             `backdrop-blur` нь ард талыг нь бүдгэрүүлдэг тул
             хээн дээр ч текст цэвэр уншигдана. */}
         <div className="bg-surface/80 backdrop-blur-lg border border-rule/50 rounded-lg p-8 shadow-2xl shadow-black/40">
-          <h1 className="font-serif text-4xl font-medium text-center">ursGAL</h1>
-          <p className="mt-2 text-center text-sm text-ink-muted">
-            {t('Нөөц ба захиалгын систем')}
+          <div className="flex flex-col items-center">
+            <img src="/brand/mark-dark.svg" alt="" width="56" height="56" className="h-14 w-14" />
+            <h1 className="mt-3 font-brand text-3xl font-bold tracking-tight">Ochir</h1>
+          </div>
+          <p className="mt-1.5 text-center text-sm text-ink-muted">
+            {t('Захиалга, хүргэлтийн систем')}
           </p>
 
           {DEMO && (
@@ -126,7 +129,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-bg border border-rule rounded px-3 py-2 text-sm focus:outline-none focus:border-ink-muted"
-                placeholder="admin@ursgal.mn"
+                placeholder="admin@ochir.mn"
               />
             </div>
 

@@ -195,8 +195,8 @@ api руу **same-origin proxy** хийнэ. Refresh token нь `SameSite=Strict
 
 | Сервис | Dockerfile (`RAILWAY_DOCKERFILE_PATH`) | Гол хувьсагчид |
 |---|---|---|
-| api | `backend/Dockerfile.api` | `DATABASE_URL=${{Postgres.DATABASE_URL}}`, `JWT_SECRET`, `JWT_REFRESH_SECRET` (санамсаргүй), `NODE_ENV=production`, `PORT=3000`, `TRUST_PROXY=true`, `CORS_ORIGIN=https://${{web.RAILWAY_PUBLIC_DOMAIN}}`, `DEMO_MODE=1`, `DEMO_READONLY_USERS=demo@ursgal.mn` |
-| web | `frontend/Dockerfile` | `API_UPSTREAM=http://${{api.RAILWAY_PRIVATE_DOMAIN}}:${{api.PORT}}`, `VITE_DEMO_LOGIN=demo@ursgal.mn:Demo1234` (build arg) |
+| api | `backend/Dockerfile.api` | `DATABASE_URL=${{Postgres.DATABASE_URL}}`, `JWT_SECRET`, `JWT_REFRESH_SECRET` (санамсаргүй), `NODE_ENV=production`, `PORT=3000`, `TRUST_PROXY=true`, `CORS_ORIGIN=https://${{web.RAILWAY_PUBLIC_DOMAIN}}`, `DEMO_MODE=1`, `DEMO_READONLY_USERS=demo@ochir.mn` |
+| web | `frontend/Dockerfile` | `API_UPSTREAM=http://${{api.RAILWAY_PRIVATE_DOMAIN}}:${{api.PORT}}`, `VITE_DEMO_LOGIN=demo@ochir.mn:Demo1234` (build arg) |
 
 - api эхлэхдээ `prisma migrate deploy` → User хүснэгт хоосон бол
   `DEMO_MODE=1` үед `prisma/seed-demo.ts` («Демо дэлгүүр»: 20 бараа,

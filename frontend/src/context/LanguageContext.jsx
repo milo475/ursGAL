@@ -28,7 +28,7 @@ const DICT = {
   },
   en: {
     // — Нэвтрэлт, бүрхүүл —
-    'Нөөц ба захиалгын систем': 'Inventory & order system',
+    'Захиалга, хүргэлтийн систем': 'Order & delivery system',
     'Имэйл': 'Email',
     'Нууц үг': 'Password',
     'Нэвтрэх': 'Log in',

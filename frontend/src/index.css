@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 /* Serif — PT Serif (кирилл бүрэн: Ө/Ү нь cyrillic-ext-д байдаг тул заавал) */
+/* Ochir брэндийн нэр (зөвхөн "Ochir" латин үг) — Inter Bold */
+@import "@fontsource/inter/latin-700.css";
 @import "@fontsource/pt-serif/latin-400.css";
 @import "@fontsource/pt-serif/cyrillic-400.css";
 @import "@fontsource/pt-serif/cyrillic-ext-400.css";
@@ -20,6 +22,7 @@
 @import "@fontsource/ibm-plex-mono/400.css";
 
 @theme {
+  --font-brand: "Inter", system-ui, sans-serif;
   --font-serif: "PT Serif", Georgia, serif;
   --font-mono: "IBM Plex Mono", monospace;
   --font-sans: "Noto Sans", sans-serif;

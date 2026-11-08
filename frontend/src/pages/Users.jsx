@@ -126,7 +126,7 @@ function UserForm({ submitting, error, onSubmit, onCancel, t, companies }) {
         required
         value={values.email}
         onChange={set('email')}
-        placeholder="ajiltan@ursgal.mn"
+        placeholder="ajiltan@ochir.mn"
       />
       <Input
         id="u-password"

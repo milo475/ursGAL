@@ -7,23 +7,37 @@ npx prisma migrate deploy
 
 # Эхний ажиллуулалтыг User хүснэгт хоосон эсэхээр таньж seed хийнэ —
 # дараагийн restart-уудад бодит өгөгдлийг (хөлс, нууц үг) дарж бичихгүй.
-USERS=$(node -e "
+# count_users [username] — хэрэглэгчийн тоо (username өгвөл зөвхөн тэр нэрээр)
+count_users() {
+  COUNT_USERNAME="$1" node -e "
 const { PrismaPg } = require('@prisma/adapter-pg');
 const { PrismaClient } = require('./dist/generated/prisma/client');
 const p = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
-p.user.count().then((c) => { console.log(c); return p.\$disconnect(); });
-")
-if [ "$USERS" = "0" ]; then
-  if [ "$DEMO_MODE" = "1" ]; then
-    # Нээлттэй демо: «Демо дэлгүүр» өгөгдөл (seed-demo.ts)
-    echo "▸ Эхний ажиллуулалт — демо seed"
+const u = process.env.COUNT_USERNAME;
+p.user.count(u ? { where: { username: u } } : undefined).then((c) => { console.log(c); return p.\$disconnect(); });
+"
+}
+
+if [ "$DEMO_MODE" = "1" ]; then
+  # Нээлттэй демо: демо хэрэглэгч (DEMO_READONLY_USERS-ийн эхнийх) байхгүй бол
+  # «Демо дэлгүүр» өгөгдлийг шинээр ачаална — демо имэйл солигдоход ч ажиллана.
+  DEMO_USERNAME=$(echo "${DEMO_READONLY_USERS:-}" | cut -d, -f1 | tr -d ' ')
+  if [ -z "$DEMO_USERNAME" ] || [ "$(count_users "$DEMO_USERNAME")" = "0" ]; then
+    echo "▸ Демо seed (демо хэрэглэгч олдсонгүй)"
     npx tsx prisma/seed-demo.ts
   else
-    echo "▸ Эхний ажиллуулалт — prisma db seed"
-    npx prisma db seed
+    echo "▸ Демо seed алгасав ($DEMO_USERNAME байна)"
   fi
 else
-  echo "▸ Seed алгасав (хэрэглэгч: $USERS)"
+  # Эхний ажиллуулалтыг User хүснэгт хоосон эсэхээр таньж seed хийнэ —
+  # дараагийн restart-уудад бодит өгөгдлийг (хөлс, нууц үг) дарж бичихгүй.
+  USERS=$(count_users)
+  if [ "$USERS" = "0" ]; then
+    echo "▸ Эхний ажиллуулалт — prisma db seed"
+    npx prisma db seed
+  else
+    echo "▸ Seed алгасав (хэрэглэгч: $USERS)"
+  fi
 fi
 
 echo "▸ node dist/main"

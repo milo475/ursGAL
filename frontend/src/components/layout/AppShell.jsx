@@ -274,8 +274,12 @@ export default function AppShell() {
       {/* ── Баруун тал: topbar + контент ── */}
       <div className="flex-1 min-w-0 flex flex-col">
         <header className="h-12 border-b border-rule flex items-center gap-3 px-4 md:px-6 shrink-0">
-          <NavLink to="/" className="font-serif text-xl font-medium tracking-tight">
-            ursGAL
+          {/* Брэнд: тэмдэг + нэр; sidebar хумигдсан үед (md+) зөвхөн тэмдэг */}
+          <NavLink to="/" className="flex items-center gap-2" aria-label="Ochir — нүүр">
+            <img src="/brand/mark-dark.svg" alt="" width="24" height="24" className="h-6 w-6 shrink-0" />
+            <span className={`font-brand text-lg font-bold tracking-tight ${collapsed ? 'md:hidden' : ''}`}>
+              Ochir
+            </span>
           </NavLink>
           <div className="ml-auto flex items-center gap-2 md:gap-3">
             {/* Offline индикатор (V4-10) */}

@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 /** Нэвтэрсэн бүх хэрэглэгчид харагдах public түлхүүрүүд + default утга */
 export const PUBLIC_SETTINGS: Record<string, string> = {
-  companyName: 'ursGAL',
+  companyName: 'Ochir',
   companyPhone: '',
   // Нийтийн захиалгын хуудсанд харагдах данс (V5)
   bankName: '',
