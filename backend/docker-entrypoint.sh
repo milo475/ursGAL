@@ -14,8 +14,14 @@ const p = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.e
 p.user.count().then((c) => { console.log(c); return p.\$disconnect(); });
 ")
 if [ "$USERS" = "0" ]; then
-  echo "▸ Эхний ажиллуулалт — prisma db seed"
-  npx prisma db seed
+  if [ "$DEMO_MODE" = "1" ]; then
+    # Нээлттэй демо: «Демо дэлгүүр» өгөгдөл (seed-demo.ts)
+    echo "▸ Эхний ажиллуулалт — демо seed"
+    npx tsx prisma/seed-demo.ts
+  else
+    echo "▸ Эхний ажиллуулалт — prisma db seed"
+    npx prisma db seed
+  fi
 else
   echo "▸ Seed алгасав (хэрэглэгч: $USERS)"
 fi

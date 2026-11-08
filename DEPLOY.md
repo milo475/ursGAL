@@ -185,3 +185,25 @@ CI-ийн "Docker compose (smoke)" job push бүрт яг энэ урсгалы�
 | CI/Docker | .github/workflows/ci.yml (e2e + docker smoke), docker compose up -d |
 
 Smoke: `bash backend/scripts/smoke-test.sh`.
+
+## 12. Railway — нээлттэй демо (3 сервис)
+
+`Postgres` + `api` + `web`. Web нь nginx-ээр SPA-г үйлчилж `/api/*`-г
+api руу **same-origin proxy** хийнэ. Refresh token нь `SameSite=Strict`,
+`path=/api/auth` httpOnly cookie тул web, api тусдаа домэйнд байвал
+(`*.up.railway.app` нь public suffix) cookie дамжихгүй — proxy заавал.
+
+| Сервис | Dockerfile (`RAILWAY_DOCKERFILE_PATH`) | Гол хувьсагчид |
+|---|---|---|
+| api | `backend/Dockerfile.api` | `DATABASE_URL=${{Postgres.DATABASE_URL}}`, `JWT_SECRET`, `JWT_REFRESH_SECRET` (санамсаргүй), `NODE_ENV=production`, `PORT=3000`, `TRUST_PROXY=true`, `CORS_ORIGIN=https://${{web.RAILWAY_PUBLIC_DOMAIN}}`, `DEMO_MODE=1`, `DEMO_READONLY_USERS=demo@ursgal.mn` |
+| web | `frontend/Dockerfile` | `API_UPSTREAM=http://${{api.RAILWAY_PRIVATE_DOMAIN}}:${{api.PORT}}`, `VITE_DEMO_LOGIN=demo@ursgal.mn:Demo1234` (build arg) |
+
+- api эхлэхдээ `prisma migrate deploy` → User хүснэгт хоосон бол
+  `DEMO_MODE=1` үед `prisma/seed-demo.ts` («Демо дэлгүүр»: 20 бараа,
+  40 захиалга, 3 жолооч), эс бөгөөс энгийн seed.
+- `DEMO_READONLY_USERS` дахь хэрэглэгч зөвхөн GET — бусад бүх API 403
+  (`src/auth/guards/demo-readonly.guard.ts`). Тиймээс демо өгөгдлийг
+  өдөр бүр дахин ачаалах cron шаардлагагүй.
+- Демо өгөгдлийг гараар шинэчлэх: `railway ssh --service api` →
+  `DEMO_MODE=1 npx tsx prisma/seed-demo.ts` (⚠ DB-г бүхэлд нь цэвэрлэнэ).
+- Health: `https://<api>/api/health`, `https://<web>/api/health`.

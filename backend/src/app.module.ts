@@ -2,6 +2,7 @@ import type { ServerResponse } from 'node:http';
 import { join } from 'node:path';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { DemoReadonlyGuard } from './auth/guards/demo-readonly.guard';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ActivityLogInterceptor } from './activity-log/activity-log.interceptor';
 import { ActivityLogModule } from './activity-log/activity-log.module';
@@ -67,26 +68,30 @@ import { WarehouseModule } from './warehouse/warehouse.module';
     // uploads/ нь ЭНД БИШ — UploadsModule-ээр эрхийн хамгаалалттай
     // үйлчлэгдэнэ (V5). ServeStatic нь guard-аар дамждаггүй тул
     // гүйлгээний баримт, хүргэлтийн зураг нэвтрэлтгүй задардаг байв.
-    ServeStaticModule.forRoot(
-      {
-        rootPath: join(__dirname, '..', '..', 'frontend', 'dist'),
-        exclude: ['/api/{*path}'],
-        serveStaticOptions: {
-          setHeaders: (res: ServerResponse, path: string) => {
-            if (path.endsWith('.html')) {
-              // index.html хэзээ ч cache-лэгдэхгүй — шинэ build шууд очно
-              res.setHeader('Cache-Control', 'no-store');
-            } else if (path.includes('/assets/')) {
-              // hash-тай asset-ууд — урт хугацааны cache
-              res.setHeader(
-                'Cache-Control',
-                'public, max-age=31536000, immutable',
-              );
-            }
-          },
-        },
-      },
-    ),
+    // SERVE_FRONTEND=false — API тусдаа сервис (Railway: web нь nginx-ээр
+    // static файлаа өөрөө үйлчилж /api-г энд proxy хийнэ)
+    ...(process.env.SERVE_FRONTEND === 'false'
+      ? []
+      : [
+          ServeStaticModule.forRoot({
+            rootPath: join(__dirname, '..', '..', 'frontend', 'dist'),
+            exclude: ['/api/{*path}'],
+            serveStaticOptions: {
+              setHeaders: (res: ServerResponse, path: string) => {
+                if (path.endsWith('.html')) {
+                  // index.html хэзээ ч cache-лэгдэхгүй — шинэ build шууд очно
+                  res.setHeader('Cache-Control', 'no-store');
+                } else if (path.includes('/assets/')) {
+                  // hash-тай asset-ууд — урт хугацааны cache
+                  res.setHeader(
+                    'Cache-Control',
+                    'public, max-age=31536000, immutable',
+                  );
+                }
+              },
+            },
+          }),
+        ]),
     PrismaModule,
     PermissionsModule,
     AuthModule,
@@ -131,6 +136,8 @@ import { WarehouseModule } from './warehouse/warehouse.module';
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     // Түр нууц үгтэй хэрэглэгчийг солитол нь түгжинэ (V4-06)
     { provide: APP_GUARD, useClass: PasswordChangeGuard },
+    // Демо хэрэглэгч зөвхөн унших (DEMO_READONLY_USERS)
+    { provide: APP_GUARD, useClass: DemoReadonlyGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_GUARD, useClass: PermissionsGuard },
     // Амжилттай өөрчлөлт бүрийг ActivityLog-д бичнэ

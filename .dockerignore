@@ -9,3 +9,6 @@ backend/src/generated
 .env
 **/.env
 *.md
+**/.env.*
+!**/.env.example
+.vercel

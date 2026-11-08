@@ -7,6 +7,17 @@ import { useLang } from '../context/LanguageContext'
 import { api } from '../lib/api'
 import AuthShell from '../components/auth/AuthShell'
 
+/**
+ * Нээлттэй демо (build-ийн үед VITE_DEMO_LOGIN="имэйл:нууц үг").
+ * Тохируулаагүй бол юу ч харагдахгүй — энгийн байршуулалтад нөлөөгүй.
+ */
+const DEMO = (() => {
+  const raw = import.meta.env.VITE_DEMO_LOGIN
+  if (!raw || !raw.includes(':')) return null
+  const i = raw.indexOf(':')
+  return { email: raw.slice(0, i), password: raw.slice(i + 1) }
+})()
+
 export default function Login() {
   const { user, loading, login } = useAuth()
   const { t } = useLang()
@@ -77,6 +88,27 @@ export default function Login() {
           <p className="mt-2 text-center text-sm text-ink-muted">
             {t('Нөөц ба захиалгын систем')}
           </p>
+
+          {DEMO && (
+            <div className="mt-6 flex items-center justify-between gap-3 rounded border border-rule bg-bg/60 px-3 py-2.5 text-sm">
+              <span>
+                <span className="text-ink-muted">Демо: </span>
+                <span className="font-mono">
+                  {DEMO.email} / {DEMO.password}
+                </span>
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail(DEMO.email)
+                  setPassword(DEMO.password)
+                }}
+                className="shrink-0 underline underline-offset-2 text-ink-muted hover:text-ink"
+              >
+                Бөглөх
+              </button>
+            </div>
+          )}
 
           <form onSubmit={onSubmit} className="mt-8 space-y-4">
             <div>

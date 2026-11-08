@@ -1,0 +1,30 @@
+# ursGAL API — зөвхөн backend (Railway "api" сервис).
+# Context: repo-гийн ROOT (railway.json-ийн dockerfilePath = backend/Dockerfile.api).
+# Frontend-ийг "web" сервис (frontend/Dockerfile, nginx) үйлчилнэ.
+# Нэг контейнерт хоёуланг нь ажиллуулах бол backend/Dockerfile (docker compose).
+
+FROM node:20-slim AS build
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ ca-certificates && rm -rf /var/lib/apt/lists/*
+WORKDIR /app/backend
+COPY backend/package*.json ./
+RUN npm ci
+COPY backend ./
+RUN npx prisma generate && npm run build
+
+FROM node:20-slim
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+ENV NODE_ENV=production \
+    SERVE_FRONTEND=false \
+    TZ=Asia/Ulaanbaatar
+WORKDIR /app/backend
+# prisma CLI (migrate deploy) + tsx (seed) runtime-д хэрэгтэй тул бүтэн node_modules
+COPY --from=build /app/backend/node_modules ./node_modules
+COPY --from=build /app/backend/dist ./dist
+COPY --from=build /app/backend/src/generated ./src/generated
+COPY backend/package*.json backend/prisma.config.ts backend/docker-entrypoint.sh ./
+COPY backend/prisma ./prisma
+COPY backend/scripts ./scripts
+EXPOSE 3000
+CMD ["sh", "./docker-entrypoint.sh"]
