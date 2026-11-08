@@ -59,9 +59,9 @@
 
 /* ── Эрх бүрийн accent (dark үндсэн) ─────────────────────────── */
 [data-role="admin"] {
-  --color-accent:            oklch(0.62 0.15 20); /* бордо-улаан */
-  --color-accent-foreground: oklch(0.13 0.01 20);
-  --color-accent-muted:      oklch(0.30 0.06 20);
+  --color-accent:            #FF6B2C; /* Ochir брэндийн улбар шар */
+  --color-accent-foreground: oklch(0.15 0.02 45);
+  --color-accent-muted:      oklch(0.32 0.08 45);
 }
 [data-role="manager"] {
   --color-accent:            oklch(0.70 0.12 250); /* хөх */
@@ -111,9 +111,9 @@
 
 /* Light темэд accent-ууд бараанаар */
 [data-theme="light"][data-role="admin"] {
-  --color-accent:            oklch(0.45 0.16 20);
-  --color-accent-foreground: oklch(0.98 0.005 20);
-  --color-accent-muted:      oklch(0.90 0.05 20);
+  --color-accent:            #FF6B2C; /* Ochir брэндийн улбар шар */
+  --color-accent-foreground: oklch(0.15 0.02 45);
+  --color-accent-muted:      oklch(0.93 0.05 45);
 }
 [data-theme="light"][data-role="manager"] {
   --color-accent:            oklch(0.48 0.14 250);
