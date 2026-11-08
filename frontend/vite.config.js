@@ -10,8 +10,10 @@ export default defineConfig({
     tailwindcss(),
     // PWA (V4-10): жолооч утсандаа суулгаж, offline үед ч app нээгдэнэ
     VitePWA({
+      // Шинэ хувилбар гармагц SW шууд идэвхжиж (skipWaiting), нээлттэй табуудыг
+      // удирдана (clientsClaim); хуудас src/pwa.js-ээр өөрөө дахин ачаалагдана.
       registerType: 'autoUpdate',
-      injectRegister: 'auto',
+      injectRegister: false, // бүртгэлийг src/pwa.js хийнэ
       includeAssets: ['brand/favicon-32.png', 'brand/apple-touch-icon-180.png', 'brand/mark-dark.svg'],
       manifest: {
         name: 'Ochir — захиалга, хүргэлт',
@@ -33,6 +35,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true, // хуучин хувилбарын precache-ийг устгана
         // App shell + asset-ууд precache хийгдэнэ; API кэшлэхгүй
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         navigateFallback: '/index.html',
