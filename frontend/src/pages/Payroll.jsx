@@ -195,7 +195,7 @@ export default function Payroll() {
                 <p className="mt-1 font-mono text-sm text-ink-muted tabular-nums">
                   {row.deliveredCount} × {formatMoney(row.feePerDelivery)}
                 </p>
-                <p className="mt-3 font-mono text-3xl tabular-nums text-accent">
+                <p className="mt-3 font-mono text-3xl tabular-nums text-accent-text">
                   {formatMoney(row.amount)}
                 </p>
                 <Button

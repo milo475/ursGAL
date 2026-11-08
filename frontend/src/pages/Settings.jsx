@@ -296,7 +296,7 @@ function SystemSettings({ t }) {
         className="w-full bg-bg border border-rule rounded px-3 py-2 text-sm leading-relaxed resize-y focus:outline-none focus:border-ink-muted"
       />
       <p className="mt-2 text-xs text-ink-muted">
-        <span className="font-mono text-accent">
+        <span className="font-mono text-accent-text">
           {'{нэр} {бараа} {хоног} {утас} {компани}'}
         </span>
       </p>
@@ -327,7 +327,7 @@ function SystemSettings({ t }) {
         <dl className="space-y-1">
           {DM_TOKENS.map(([token, note]) => (
             <div key={token} className="flex gap-2 text-xs">
-              <dt className="font-mono text-accent shrink-0">{token}</dt>
+              <dt className="font-mono text-accent-text shrink-0">{token}</dt>
               <dd className="text-ink-muted">{t(note)}</dd>
             </div>
           ))}

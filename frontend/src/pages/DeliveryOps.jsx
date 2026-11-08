@@ -186,7 +186,7 @@ export default function DeliveryOps() {
                 onClick={() => setDriverId(d.id === driverId ? null : d.id)}
                 className={`w-full flex items-center gap-2 rounded px-2 py-1.5 text-sm text-left transition-colors ${
                   d.id === driverId
-                    ? 'bg-accent/12 text-accent'
+                    ? 'bg-accent/12 text-accent-text'
                     : 'hover:bg-bg'
                 }`}
               >
@@ -220,7 +220,7 @@ export default function DeliveryOps() {
                       key={o.id}
                       className="flex items-center gap-2 bg-bg border border-rule rounded px-2 py-1.5"
                     >
-                      <span className="font-mono text-xs text-accent tabular-nums w-5 shrink-0">
+                      <span className="font-mono text-xs text-accent-text tabular-nums w-5 shrink-0">
                         {i + 1}.
                       </span>
                       <span className="flex-1 min-w-0">

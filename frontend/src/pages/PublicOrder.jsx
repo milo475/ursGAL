@@ -230,7 +230,7 @@ export default function PublicOrder() {
             key={label}
             className={`flex-1 text-center py-1.5 rounded border ${
               step === i + 1
-                ? 'border-accent/50 text-accent bg-accent/12'
+                ? 'border-accent/50 text-accent-text bg-accent/12'
                 : 'border-rule text-ink-muted'
             }`}
           >
@@ -284,7 +284,7 @@ export default function PublicOrder() {
                               </span>
                             )}
                             {inCart && (
-                              <span className="block text-xs text-accent mt-0.5">
+                              <span className="block text-xs text-accent-text mt-0.5">
                                 Сагсанд {inCart.qty}
                               </span>
                             )}
@@ -359,7 +359,7 @@ export default function PublicOrder() {
                 type="button"
                 onClick={() => setForm((f) => ({ ...f, region: v }))}
                 className={`py-3 text-sm font-medium ${
-                  form.region === v ? 'bg-accent/15 text-accent' : 'text-ink-muted'
+                  form.region === v ? 'bg-accent/15 text-accent-text' : 'text-ink-muted'
                 }`}
               >
                 {label}
@@ -487,7 +487,7 @@ export default function PublicOrder() {
                   onClick={() => setForm((f) => ({ ...f, channel: v }))}
                   className={`px-3 py-1.5 rounded border text-sm ${
                     form.channel === v
-                      ? 'border-accent/50 text-accent bg-accent/12'
+                      ? 'border-accent/50 text-accent-text bg-accent/12'
                       : 'border-rule text-ink-muted'
                   }`}
                 >

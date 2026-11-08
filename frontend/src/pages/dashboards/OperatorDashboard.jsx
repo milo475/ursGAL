@@ -117,7 +117,7 @@ export default function OperatorDashboard() {
             <button
               type="button"
               onClick={() => navigate('/supplies')}
-              className="text-sm text-accent underline underline-offset-2"
+              className="text-sm text-accent-text underline underline-offset-2"
             >
               {t('Бүгдийг харах')} →
             </button>

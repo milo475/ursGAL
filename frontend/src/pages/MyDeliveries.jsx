@@ -132,7 +132,7 @@ export default function MyDeliveries() {
         <ol className="mt-6 divide-y divide-rule border-y border-rule">
           {deliveries.map((d, i) => (
             <li key={d.id} className="py-3 flex items-start gap-3">
-              <span className="font-mono text-xl text-accent tabular-nums w-7 shrink-0">
+              <span className="font-mono text-xl text-accent-text tabular-nums w-7 shrink-0">
                 {i + 1}
               </span>
               <span className="flex-1 min-w-0">
@@ -141,7 +141,7 @@ export default function MyDeliveries() {
                 </span>
                 <a
                   href={`tel:${d.phone}`}
-                  className="font-mono text-base text-accent underline underline-offset-2"
+                  className="font-mono text-base text-accent-text underline underline-offset-2"
                 >
                   {d.phone}
                 </a>
@@ -151,7 +151,7 @@ export default function MyDeliveries() {
                 target="_blank"
                 rel="noreferrer"
                 aria-label={t('Замын зураг')}
-                className="p-2 text-ink-muted hover:text-accent shrink-0"
+                className="p-2 text-ink-muted hover:text-accent-text shrink-0"
               >
                 <MapIcon size={20} />
               </a>
@@ -167,7 +167,7 @@ export default function MyDeliveries() {
             >
               <div className="flex items-baseline justify-between gap-3">
                 <span className="flex items-baseline gap-2">
-                  <span className="font-mono text-lg text-accent tabular-nums">
+                  <span className="font-mono text-lg text-accent-text tabular-nums">
                     №{i + 1}
                   </span>
                   <span className="font-mono text-sm text-ink-muted">
@@ -185,14 +185,14 @@ export default function MyDeliveries() {
               <div className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
                 <a
                   href={`tel:${d.phone}`}
-                  className="font-mono text-xl text-accent underline underline-offset-4"
+                  className="font-mono text-xl text-accent-text underline underline-offset-4"
                 >
                   📞 {d.phone}
                 </a>
                 {d.extraPhone && (
                   <a
                     href={`tel:${d.extraPhone}`}
-                    className="font-mono text-lg text-accent underline underline-offset-4"
+                    className="font-mono text-lg text-accent-text underline underline-offset-4"
                   >
                     📞 {d.extraPhone}
                   </a>
@@ -231,7 +231,7 @@ export default function MyDeliveries() {
                 {t('Замын зураг')}
               </a>
               {d.deliveryStatus === 'ON_THE_WAY' ? (
-                <p className="mt-2 text-center text-base text-accent">
+                <p className="mt-2 text-center text-base text-accent-text">
                   {t('Замд яваа')}
                 </p>
               ) : (

@@ -48,7 +48,7 @@ export default function DriverDashboard() {
           <p className="text-xs uppercase tracking-wide text-ink-muted">
             {t('Тооцоогүй цалин')}
           </p>
-          <p className="mt-2 font-mono text-5xl tabular-nums text-accent">
+          <p className="mt-2 font-mono text-5xl tabular-nums text-accent-text">
             {formatMoney(data.earnings.unpaid)}
           </p>
           <p className="mt-1 text-sm text-ink-muted font-mono tabular-nums">

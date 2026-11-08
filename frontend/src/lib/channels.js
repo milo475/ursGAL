@@ -3,7 +3,7 @@
  * шивдэг тул эх сурвалжийг тэмдэглэж маркетингийн үр дүнг хэмждэг.
  */
 export const CHANNELS = [
-  ['INSTAGRAM', 'Instagram', 'text-accent border-accent/40 bg-accent/12'],
+  ['INSTAGRAM', 'Instagram', 'text-accent-text border-accent/40 bg-accent/12'],
   ['FACEBOOK', 'Facebook', 'text-safe border-safe/40 bg-safe/12'],
   ['PHONE', 'Утас', 'text-status-preparing border-status-preparing/40 bg-status-preparing/12'],
   ['OTHER', 'Бусад', 'text-ink-muted border-rule'],

@@ -121,7 +121,7 @@ export default function SellerDashboard() {
             <button
               type="button"
               onClick={() => navigate('/order-requests')}
-              className="text-sm text-accent underline underline-offset-2"
+              className="text-sm text-accent-text underline underline-offset-2"
             >
               {t('Бүгдийг харах')} →
             </button>
@@ -178,7 +178,7 @@ export default function SellerDashboard() {
             <button
               type="button"
               onClick={() => navigate('/orders')}
-              className="text-sm text-accent underline underline-offset-2"
+              className="text-sm text-accent-text underline underline-offset-2"
             >
               {t('Захиалга')} →
             </button>

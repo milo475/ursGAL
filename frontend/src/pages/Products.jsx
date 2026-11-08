@@ -461,7 +461,7 @@ function ImportButton({ t, onDone }) {
           <button
             type="button"
             onClick={downloadTemplate}
-            className="text-sm text-accent underline underline-offset-2"
+            className="text-sm text-accent-text underline underline-offset-2"
           >
             ⬇ {t('Загвар татах (CSV)')}
           </button>

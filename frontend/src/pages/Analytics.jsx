@@ -122,7 +122,7 @@ export default function Analytics() {
               }}
               className={`px-3 py-1.5 rounded text-sm transition-colors ${
                 !custom && days === n
-                  ? 'bg-surface text-accent'
+                  ? 'bg-surface text-accent-text'
                   : 'text-ink-muted hover:text-ink'
               }`}
             >

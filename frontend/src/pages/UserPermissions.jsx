@@ -130,7 +130,7 @@ export default function UserPermissions() {
 
       <div className="mt-4 flex items-center gap-3 flex-wrap">
         <h1 className="font-serif text-4xl font-medium">{panel.name}</h1>
-        <span className="font-mono text-[11px] uppercase tracking-wide border rounded px-1.5 py-0.5 text-accent border-accent/40 bg-accent/12">
+        <span className="font-mono text-[11px] uppercase tracking-wide border rounded px-1.5 py-0.5 text-accent-text border-accent/40 bg-accent/12">
           {t(ROLE_LABELS[panel.role] ?? panel.role)}
         </span>
       </div>
@@ -165,7 +165,7 @@ export default function UserPermissions() {
                         checked={shownOf(item)}
                         disabled={isAdmin || saving}
                         onChange={() => toggle(item)}
-                        className="size-4 accent-current text-accent shrink-0"
+                        className="size-4 accent-current text-accent-text shrink-0"
                       />
                       <span className="flex-1 min-w-0 text-sm">
                         {t(item.label)}
@@ -184,7 +184,7 @@ export default function UserPermissions() {
                               e.preventDefault()
                               resetToDefault(item)
                             }}
-                            className="text-[11px] text-accent underline underline-offset-2 shrink-0"
+                            className="text-[11px] text-accent-text underline underline-offset-2 shrink-0"
                           >
                             {t('Default руу буцаах')}
                           </button>

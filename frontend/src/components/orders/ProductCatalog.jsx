@@ -141,7 +141,7 @@ export default function ProductCatalog({
                             className={`font-mono text-xs border rounded px-2 py-1 ${
                               added
                                 ? 'text-safe border-safe/40 bg-safe/12'
-                                : 'text-accent border-accent/40'
+                                : 'text-accent-text border-accent/40'
                             }`}
                           >
                             {added ? `✓ ${t('Сагсанд')}` : `+ ${t('Сагслах')}`}

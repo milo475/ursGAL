@@ -121,7 +121,7 @@ export default function OrderRequests() {
                 .then(() => toast.show(t('Линк хуулагдлаа')))
                 .catch(() => toast.show(link))
             }}
-            className="text-sm text-accent underline underline-offset-2"
+            className="text-sm text-accent-text underline underline-offset-2"
             title={link}
           >
             🔗 {t('Захиалгын линк хуулах')}
@@ -176,7 +176,7 @@ export default function OrderRequests() {
                             setHistory({ phone: r.phone, name: r.customerName })
                           }
                           title={t('Худалдан авалтын түүх')}
-                          className="font-mono tabular-nums text-accent underline underline-offset-2"
+                          className="font-mono tabular-nums text-accent-text underline underline-offset-2"
                         >
                           {r.phone}
                         </button>
@@ -184,7 +184,7 @@ export default function OrderRequests() {
                         <span className="font-mono tabular-nums">{r.phone}</span>
                       )}
                       {r.socialName && (
-                        <span className="text-sm text-accent">{r.socialName}</span>
+                        <span className="text-sm text-accent-text">{r.socialName}</span>
                       )}
                       <span
                         className={`inline-flex font-mono text-[10px] uppercase border rounded px-1 py-0.5 ${channelStyle(r.channel)}`}

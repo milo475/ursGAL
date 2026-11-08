@@ -39,7 +39,7 @@ function actionKind(action) {
 
 const ACTION_STYLE = {
   create: 'text-safe border-safe/40 bg-safe/12',
-  update: 'text-accent border-accent/40 bg-accent/10',
+  update: 'text-accent-text border-accent/40 bg-accent/10',
   delete: 'text-alarm border-alarm/40 bg-alarm/10',
   permission: 'text-status-preparing border-status-preparing/40 bg-status-preparing/12',
   loginFailed: 'text-alarm border-alarm/40 bg-alarm/12',

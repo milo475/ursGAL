@@ -69,7 +69,7 @@ function Stepper({ step, onBack, t }) {
             onClick={() => done && onBack(n)}
             className={`flex items-center gap-2 px-3 py-1.5 rounded border text-sm transition-colors ${
               active
-                ? 'border-accent/50 text-accent bg-accent/12'
+                ? 'border-accent/50 text-accent-text bg-accent/12'
                 : done
                   ? 'border-rule text-ink hover:border-ink-muted'
                   : 'border-rule text-ink-muted'
@@ -78,7 +78,7 @@ function Stepper({ step, onBack, t }) {
             <span
               className={`font-mono w-5 h-5 rounded-full border flex items-center justify-center text-xs ${
                 active
-                  ? 'border-accent/60 text-accent'
+                  ? 'border-accent/60 text-accent-text'
                   : 'border-rule text-ink-muted'
               }`}
             >
@@ -243,7 +243,7 @@ export default function OrderNew() {
                 onClick={() => setForm((f) => ({ ...f, region: value }))}
                 className={`py-3 text-base font-medium transition-colors ${
                   form.region === value
-                    ? 'bg-accent/15 text-accent'
+                    ? 'bg-accent/15 text-accent-text'
                     : 'text-ink-muted hover:text-ink'
                 }`}
               >
@@ -428,7 +428,7 @@ export default function OrderNew() {
                   onClick={() => setChannel(value)}
                   className={`px-4 py-2 text-sm font-medium transition-colors ${
                     channel === value
-                      ? 'bg-accent/15 text-accent'
+                      ? 'bg-accent/15 text-accent-text'
                       : 'text-ink-muted hover:text-ink'
                   }`}
                 >
@@ -525,7 +525,7 @@ export default function OrderNew() {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="mt-1 text-xs text-accent underline underline-offset-2"
+                  className="mt-1 text-xs text-accent-text underline underline-offset-2"
                 >
                   {t('Засах')}
                 </button>

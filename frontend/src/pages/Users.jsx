@@ -523,7 +523,7 @@ export default function Users() {
             <button
               type="button"
               onClick={() => navigate(`/users/${u.id}/permissions`)}
-              className="text-xs text-accent hover:underline underline-offset-2"
+              className="text-xs text-accent-text hover:underline underline-offset-2"
             >
               {t('Эрхүүд')}
             </button>
@@ -701,7 +701,7 @@ function ZonePicker({ value, onChange, t }) {
             onClick={() => toggle(d)}
             className={`px-2.5 py-1 rounded border text-sm transition-colors ${
               value.includes(d)
-                ? 'border-accent/50 text-accent bg-accent/12'
+                ? 'border-accent/50 text-accent-text bg-accent/12'
                 : 'border-rule text-ink-muted hover:text-ink'
             }`}
           >

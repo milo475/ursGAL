@@ -14,7 +14,7 @@ export default function RankList({ items, empty = '—' }) {
           <span
             className={`font-mono text-sm w-6 h-6 shrink-0 rounded-full border flex items-center justify-center ${
               i === 0
-                ? 'text-accent border-accent/50 bg-accent/12'
+                ? 'text-accent-text border-accent/50 bg-accent/12'
                 : 'text-ink-muted border-rule'
             }`}
           >

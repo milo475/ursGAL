@@ -104,7 +104,7 @@ export default function CustomerHistoryModal({ phone, name, onClose }) {
                         className="border border-rule rounded px-2 py-0.5 text-sm"
                       >
                         {p.name}
-                        <span className="ml-1.5 font-mono text-accent">
+                        <span className="ml-1.5 font-mono text-accent-text">
                           ×{p.qty}
                         </span>
                       </li>

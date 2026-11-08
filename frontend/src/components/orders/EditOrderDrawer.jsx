@@ -268,7 +268,7 @@ export default function EditOrderDrawer({ order, onClose, onSaved }) {
               <button
                 type="button"
                 onClick={() => setShowCatalog((v) => !v)}
-                className="text-sm text-accent underline underline-offset-2"
+                className="text-sm text-accent-text underline underline-offset-2"
               >
                 {showCatalog ? t('Хаах') : `+ ${t('Бараа нэмэх')}`}
               </button>

@@ -170,7 +170,7 @@ export default function Drivers() {
           {hasPerm('finance.driver_payroll') && (
             <Link
               to="/finance/payroll"
-              className="text-sm text-accent hover:underline underline-offset-2"
+              className="text-sm text-accent-text hover:underline underline-offset-2"
             >
               {t('Жолоочийн цалин')} →
             </Link>
@@ -178,7 +178,7 @@ export default function Drivers() {
           {hasPerm('users.manage') && (
             <Link
               to="/users?role=DRIVER"
-              className="text-sm text-accent hover:underline underline-offset-2"
+              className="text-sm text-accent-text hover:underline underline-offset-2"
             >
               {t('Бүртгэл засах')} →
             </Link>

@@ -67,7 +67,7 @@ function ReportCard({ report, t, toast }) {
   return (
     <div className="bg-surface border border-rule rounded-lg p-5 flex flex-col">
       <div className="flex items-center gap-3">
-        <report.icon size={20} className="text-accent shrink-0" />
+        <report.icon size={20} className="text-accent-text shrink-0" />
         <p className="font-medium">{t(report.title)}</p>
       </div>
       <p className="mt-1.5 text-sm text-ink-muted flex-1">{t(report.note)}</p>

@@ -184,7 +184,7 @@ function Board({ t, toast }) {
                       className="border border-rule rounded px-2.5 py-1 text-sm"
                     >
                       {i.name}
-                      <span className="ml-2 font-mono tabular-nums text-accent">
+                      <span className="ml-2 font-mono tabular-nums text-accent-text">
                         ×{i.qty}
                       </span>
                     </li>

@@ -176,7 +176,7 @@ export default function DriverZones() {
                     type="button"
                     disabled={free.length === 0}
                     onClick={() => setAdding(district)}
-                    className="mt-2 text-sm text-accent underline underline-offset-2 disabled:opacity-40 disabled:no-underline"
+                    className="mt-2 text-sm text-accent-text underline underline-offset-2 disabled:opacity-40 disabled:no-underline"
                   >
                     + {t('Жолооч нэмэх')}
                   </button>

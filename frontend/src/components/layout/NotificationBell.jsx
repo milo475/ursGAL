@@ -149,7 +149,7 @@ export default function NotificationBell({ unread }) {
               setOpen(false)
               navigate('/notifications')
             }}
-            className="w-full px-3 py-2 text-sm text-accent border-t border-rule hover:bg-bg transition-colors text-center"
+            className="w-full px-3 py-2 text-sm text-accent-text border-t border-rule hover:bg-bg transition-colors text-center"
           >
             {t('Бүгдийг харах')}
           </button>

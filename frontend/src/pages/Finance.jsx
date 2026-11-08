@@ -179,7 +179,7 @@ export default function Finance() {
         <span
           className={`inline-flex font-mono text-[10px] uppercase tracking-wide border rounded px-1 py-0.5 ${
             AUTO_CATEGORY[e.category]
-              ? 'text-accent border-accent/40 bg-accent/10'
+              ? 'text-accent-text border-accent/40 bg-accent/10'
               : 'text-ink-muted border-rule'
           }`}
         >
@@ -209,14 +209,14 @@ export default function Finance() {
         e.refOrderId && e.category !== 'DRIVER_PAYROLL' ? (
           <Link
             to={`/orders/${e.refOrderId}`}
-            className="text-xs text-accent hover:underline underline-offset-2"
+            className="text-xs text-accent-text hover:underline underline-offset-2"
           >
             {t('Захиалга харах')}
           </Link>
         ) : e.category === 'DRIVER_PAYROLL' ? (
           <Link
             to="/finance/payroll"
-            className="text-xs text-accent hover:underline underline-offset-2"
+            className="text-xs text-accent-text hover:underline underline-offset-2"
           >
             {t('Тооцоо харах')}
           </Link>
@@ -240,14 +240,14 @@ export default function Finance() {
         <span className="flex items-center gap-4">
           <Link
             to="/finance/report"
-            className="text-sm text-accent hover:underline underline-offset-2"
+            className="text-sm text-accent-text hover:underline underline-offset-2"
           >
             {t('Орлого тайлан')} →
           </Link>
         {hasPerm('finance.driver_payroll') && (
           <Link
             to="/finance/payroll"
-            className="text-sm text-accent hover:underline underline-offset-2"
+            className="text-sm text-accent-text hover:underline underline-offset-2"
           >
             {t('Жолоочийн цалин')} →
           </Link>

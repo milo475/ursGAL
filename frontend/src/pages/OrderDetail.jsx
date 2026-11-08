@@ -221,7 +221,7 @@ export default function OrderDetail() {
                 type="button"
                 onClick={() => setHistory(true)}
                 title={t('Худалдан авалтын түүх')}
-                className="font-mono tabular-nums text-accent underline underline-offset-2"
+                className="font-mono tabular-nums text-accent-text underline underline-offset-2"
               >
                 {order.phone}
               </button>
@@ -280,10 +280,10 @@ export default function OrderDetail() {
               <InfoItem label={t('Сум/Суурин газар')} value={order.soum} />
               {/* Тээвэр тод — жолооч биш ачааны тээврээр явна */}
               <div>
-                <p className="text-xs uppercase tracking-wide text-accent">
+                <p className="text-xs uppercase tracking-wide text-accent-text">
                   {t('Ачаа явах тээвэр')}
                 </p>
-                <p className="mt-1 text-lg font-medium text-accent">
+                <p className="mt-1 text-lg font-medium text-accent-text">
                   {order.transport}
                 </p>
               </div>

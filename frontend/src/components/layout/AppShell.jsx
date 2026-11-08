@@ -175,14 +175,14 @@ export default function AppShell() {
       'flex items-center gap-3 rounded px-3 py-2 text-sm transition-colors',
       collapsed ? 'justify-center px-2' : '',
       isActive
-        ? 'text-accent bg-accent/10 font-medium'
+        ? 'text-accent-text bg-accent/10 font-medium'
         : 'text-ink-muted hover:text-ink hover:bg-surface',
     ].join(' ')
 
   const tabLink = ({ isActive }) =>
     [
       'flex-1 min-w-0 flex flex-col items-center gap-0.5 py-2 text-[10px] leading-tight transition-colors',
-      isActive ? 'text-accent' : 'text-ink-muted',
+      isActive ? 'text-accent-text' : 'text-ink-muted',
     ].join(' ')
 
   /**
@@ -233,7 +233,7 @@ export default function AppShell() {
           {user && !collapsed && (
             <div className="px-3 py-2">
               <p className="text-sm truncate">{user.name}</p>
-              <span className="mt-1 inline-flex font-mono text-[11px] uppercase tracking-wide border rounded px-1.5 py-0.5 text-accent border-accent/40 bg-accent/12">
+              <span className="mt-1 inline-flex font-mono text-[11px] uppercase tracking-wide border rounded px-1.5 py-0.5 text-accent-text border-accent/40 bg-accent/12">
                 {t(ROLE_LABELS[user.role] ?? user.role)}
               </span>
             </div>
@@ -407,7 +407,7 @@ export default function AppShell() {
               {user && (
                 <div className="px-3 py-2">
                   <p className="text-sm truncate">{user.name}</p>
-                  <span className="mt-1 inline-flex font-mono text-[11px] uppercase tracking-wide border rounded px-1.5 py-0.5 text-accent border-accent/40 bg-accent/12">
+                  <span className="mt-1 inline-flex font-mono text-[11px] uppercase tracking-wide border rounded px-1.5 py-0.5 text-accent-text border-accent/40 bg-accent/12">
                     {t(ROLE_LABELS[user.role] ?? user.role)}
                   </span>
                 </div>
